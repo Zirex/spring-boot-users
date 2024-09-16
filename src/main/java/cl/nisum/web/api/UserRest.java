@@ -25,7 +25,7 @@ public class UserRest {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<UserProjection> registerUser(@Valid @RequestBody RegisterUserDto registerUserDto) throws ApiException {
         log.info("saving new user");
         var userProjection = userService.saveUser(registerUserDto);

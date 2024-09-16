@@ -4,7 +4,7 @@ spring:
     application:
         name: users
     datasource:
-        url: jdbc:h2:file:./data/testdb
+        url: jdbc:h2:mem:testdb
         username: "sa"
         password: "pass"
         driver-class-name: org.h2.Driver
@@ -39,6 +39,9 @@ security:
     jwt:
         expiration-in-minutes: 30
         secret-key: ZXN0YSBlcyBtaSBjb250cmFzZW5hIHNlZ3VyYSAxMjM0NTY3ODkgQUJDYWJj
+
+# password:
+#     regex: ^(?=.*[A-Z])(?=.*\d).{8,}$  # Al menos 1 mayúscula y 1 número
 
 logging:
     level:

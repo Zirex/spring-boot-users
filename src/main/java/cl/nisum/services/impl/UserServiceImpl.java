@@ -35,46 +35,57 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProjection saveUser(RegisterUserDto registerUserDto) throws ApiException {
-        User userEntity = null;
-        UserProjection userProjection = null;
         if (this.userRepository.existsByEmail(registerUserDto.getEmail())) {
-            throw new ApiException("El correo ya registrado", HttpStatus.CONFLICT);
+            throw new ApiException("El correo ya está registrado", HttpStatus.CONFLICT);
         }
         Role role = this.roleRepository.findOneByName(RoleEnum.USER)
-                .orElseThrow(() -> new ApiException("No se encontro el rol de USER", HttpStatus.NOT_FOUND));
-        try {
-            userEntity = this.modelMapper.map(registerUserDto, User.class);
-            userEntity.setCreated(LocalDateTime.now());
-            userEntity.setLastLogin(LocalDateTime.now());
-            userEntity.setActive(true);
-            userEntity.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
-            userEntity.setRole(role);
-            this.modelMapper.map(this.userRepository.save(userEntity), userEntity);
-            log.info("Usuario creado, el nuevo usuario es " + userEntity.toString());
+        .orElseThrow(() -> new ApiException("No se encontró el rol USER", HttpStatus.NOT_FOUND));
 
-            LoginRequest loginRequest = new LoginRequest(userEntity.getEmail(), registerUserDto.getPassword());
-            userEntity.setToken(this.authenticationService.authenticate(loginRequest).jwt());
+        User userEntity = null;
+        UserProjection userProjection = null;
+        try {
+            userEntity = this.buildUserFromDto(registerUserDto, role);
+            this.modelMapper.map(this.userRepository.save(userEntity), userEntity);
+            log.info("Usuario creado: {}", userEntity.toString());
+
+            userEntity.setToken(this.authenticateUser(registerUserDto));
             userProjection = this.modelMapper.map(userEntity, UserVo.class);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("error al guardar el usuario: {}",e.getMessage(), e);
             throw new ApiException("Error al insertar datos", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return userProjection;
     }
 
     @Override
-    public UserProjection upadateUser(UUID id, RegisterUserDto registerUserDto) throws ApiException {
+    public UserProjection updateUser(UUID id, RegisterUserDto registerUserDto) throws ApiException {
         UserProjection userProjection = null;
         User userEntity = this.userRepository.findById(id)
                 .orElseThrow(() -> new ApiException("No se encontró el usuario con el id " + id, HttpStatus.NOT_FOUND));
         try {
-            this.modelMapper.map(userEntity, registerUserDto);
+            this.modelMapper.map(registerUserDto, userEntity);
             userEntity.setModified(LocalDateTime.now());
             userProjection = this.modelMapper.map(this.userRepository.save(userEntity), UserVo.class);
         } catch (Exception e) {
-            throw new ApiException("", HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Error al actualizar usuario: {}", e.getMessage(), e);
+            throw new ApiException("Error al actualizar el usuario", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return userProjection;
+    }
+
+    private User buildUserFromDto(RegisterUserDto dto, Role role) {
+        User user = modelMapper.map(dto, User.class);
+        user.setCreated(LocalDateTime.now());
+        user.setLastLogin(LocalDateTime.now());
+        user.setActive(true);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(role);
+        return user;
+    }
+
+    private String authenticateUser(RegisterUserDto dto) throws ApiException {
+        LoginRequest loginRequest = new LoginRequest(dto.getEmail(), dto.getPassword());
+        return authenticationService.authenticate(loginRequest).jwt();
     }
 
 }
