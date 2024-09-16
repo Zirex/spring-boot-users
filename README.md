@@ -55,12 +55,12 @@ El objetivo principal de esta API es registrar usuarios y permitir su autenticac
 
     - Si el correo electrónico ya existe en la base de datos, se devuelve el error:
     ```json
-{ "mensaje": "El correo ya está registrado" }
-```
+    { "mensaje": "El correo ya está registrado" }
+    ```
     - Si el correo no cumple con el formato requerido, se devuelve un mensaje de error:
     ```json
-{ "mensaje": "El correo no tiene un formato válido" }
-```
+    { "mensaje": "El correo no tiene un formato válido" }
+    ```
 
 ### 2. **Validaciones**
 Validación de correo electrónico: Se utiliza una expresión regular configurable para validar que el correo tenga un formato válido (por ejemplo, usuario@dominio.cl).
