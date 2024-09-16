@@ -56,6 +56,7 @@ public class UserDetailsDto extends User implements UserDetails {
         toReturn.setLastLogin(user.getLastLogin());
         toReturn.setPhones(user.getPhones());
         toReturn.setToken(user.getToken());
+		toReturn.setRole(user.getRole());
 
 		return toReturn;
 	}

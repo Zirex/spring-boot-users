@@ -10,10 +10,15 @@ import org.springframework.stereotype.Service;
 
 import cl.nisum.exception.ApiException;
 import cl.nisum.models.dtos.RegisterUserDto;
+import cl.nisum.models.dtos.security.LoginRequest;
+import cl.nisum.models.entities.Role;
 import cl.nisum.models.entities.User;
+import cl.nisum.models.entities.Role.RoleEnum;
 import cl.nisum.models.projection.UserProjection;
 import cl.nisum.models.vo.UserVo;
+import cl.nisum.repositories.RoleRepository;
 import cl.nisum.repositories.UserRepository;
+import cl.nisum.services.AuthenticationService;
 import cl.nisum.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService authenticationService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -31,12 +38,19 @@ public class UserServiceImpl implements UserService {
         User userEntity = null;
         UserProjection userProjection = null;
         try {
+            Role role = this.roleRepository.findOneByName(RoleEnum.USER)
+                    .orElseThrow(() -> new ApiException("No se encontro el rol de usuario", HttpStatus.NOT_FOUND));
             userEntity = this.modelMapper.map(registerUserDto, User.class);
             userEntity.setCreated(LocalDateTime.now());
             userEntity.setLastLogin(LocalDateTime.now());
             userEntity.setActive(true);
             userEntity.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
-            userProjection = this.modelMapper.map(this.userRepository.save(userEntity), UserVo.class);
+            userEntity.setRole(role);
+            this.modelMapper.map(this.userRepository.save(userEntity), userEntity);
+            log.info("Usuario creado, el nuevo usuario es " + userEntity.toString());
+            LoginRequest loginRequest = new LoginRequest(userEntity.getEmail(), registerUserDto.getPassword());
+            userEntity.setToken(this.authenticationService.authenticate(loginRequest).jwt());
+            userProjection = this.modelMapper.map(userEntity, UserVo.class);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ApiException("Error al insertar datos", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -47,7 +61,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProjection upadateUser(UUID id, RegisterUserDto registerUserDto) throws ApiException {
         UserProjection userProjection = null;
-        User userEntity = this.userRepository.findById(id).orElseThrow(() -> new ApiException("No se encontró el usuario con el id "+id, HttpStatus.NOT_FOUND));
+        User userEntity = this.userRepository.findById(id)
+                .orElseThrow(() -> new ApiException("No se encontró el usuario con el id " + id, HttpStatus.NOT_FOUND));
         try {
             this.modelMapper.map(userEntity, registerUserDto);
             userEntity.setModified(LocalDateTime.now());
@@ -57,5 +72,5 @@ public class UserServiceImpl implements UserService {
         }
         return userProjection;
     }
-    
+
 }

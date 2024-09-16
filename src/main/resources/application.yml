@@ -39,3 +39,11 @@ security:
     jwt:
         expiration-in-minutes: 30
         secret-key: ZXN0YSBlcyBtaSBjb250cmFzZW5hIHNlZ3VyYSAxMjM0NTY3ODkgQUJDYWJj
+
+logging:
+    level:
+        root: INFO
+        org:
+            springframework:
+                security: DEBUG
+            h2: DEBUG
