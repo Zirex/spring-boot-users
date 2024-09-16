@@ -17,14 +17,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class RegisterUserDto {
 
-    @NotBlank
+    @NotBlank(message = "Digite un nombre")
     private String name;
     
-    @NotBlank
-    @Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
+    @NotBlank(message = "Digite un correo")
+    @Email(regexp = "^[\\w\\d\\.-]+@[\\w]+\\.[a-zA-Z]{2}$", message = "El correo no es valido, ej: aaaaaaa@dominio.cl")
     private String email;
     
-    @NotBlank
+    @NotBlank(message = "Digite una contraseña")
     @PasswordRegex
     private String password;
     

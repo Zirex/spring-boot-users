@@ -1,4 +1,4 @@
-package cl.nisum.models.entities;
+package cl.nisum.persistence.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

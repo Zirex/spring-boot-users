@@ -1,4 +1,4 @@
-package cl.nisum.models.entities;
+package cl.nisum.persistence.entities;
 
 import java.time.LocalDateTime;
 import java.util.List;

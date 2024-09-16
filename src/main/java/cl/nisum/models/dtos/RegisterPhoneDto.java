@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Data
 public class RegisterPhoneDto {
     
-    @NotBlank
+    @NotBlank(message = "Digite un número")
     private String number;
 
-    @NotBlank
+    @NotBlank(message = "Digite un código de ciudad")
     private String citycode;
 
-    @NotBlank
+    @NotBlank(message = "Digite un código de país")
     private String contrycode;
 }

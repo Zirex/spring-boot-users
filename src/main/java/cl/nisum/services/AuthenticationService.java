@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import cl.nisum.models.dtos.security.LoginRequest;
 import cl.nisum.models.dtos.security.LoginResponse;
-import cl.nisum.models.entities.User;
+import cl.nisum.persistence.entities.User;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -22,7 +22,6 @@ public class PasswordValidator implements ConstraintValidator<PasswordRegex, Str
             return true;
         }
 
-        // Validar la contraseña contra la regex si está definida.
         return password != null && password.matches(passwordRegex);
     }
 }

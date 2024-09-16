@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 import cl.nisum.exception.ApiException;
 import cl.nisum.models.dtos.RegisterUserDto;
 import cl.nisum.models.dtos.security.LoginRequest;
-import cl.nisum.models.entities.Role;
-import cl.nisum.models.entities.User;
-import cl.nisum.models.entities.Role.RoleEnum;
 import cl.nisum.models.projection.UserProjection;
 import cl.nisum.models.vo.UserVo;
-import cl.nisum.repositories.RoleRepository;
-import cl.nisum.repositories.UserRepository;
+import cl.nisum.persistence.entities.Role;
+import cl.nisum.persistence.entities.User;
+import cl.nisum.persistence.entities.Role.RoleEnum;
+import cl.nisum.persistence.repositories.RoleRepository;
+import cl.nisum.persistence.repositories.UserRepository;
 import cl.nisum.services.AuthenticationService;
 import cl.nisum.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +37,12 @@ public class UserServiceImpl implements UserService {
     public UserProjection saveUser(RegisterUserDto registerUserDto) throws ApiException {
         User userEntity = null;
         UserProjection userProjection = null;
+        if (this.userRepository.existsByEmail(registerUserDto.getEmail())) {
+            throw new ApiException("El correo ya registrado", HttpStatus.CONFLICT);
+        }
+        Role role = this.roleRepository.findOneByName(RoleEnum.USER)
+                .orElseThrow(() -> new ApiException("No se encontro el rol de USER", HttpStatus.NOT_FOUND));
         try {
-            Role role = this.roleRepository.findOneByName(RoleEnum.USER)
-                    .orElseThrow(() -> new ApiException("No se encontro el rol de usuario", HttpStatus.NOT_FOUND));
             userEntity = this.modelMapper.map(registerUserDto, User.class);
             userEntity.setCreated(LocalDateTime.now());
             userEntity.setLastLogin(LocalDateTime.now());
@@ -48,6 +51,7 @@ public class UserServiceImpl implements UserService {
             userEntity.setRole(role);
             this.modelMapper.map(this.userRepository.save(userEntity), userEntity);
             log.info("Usuario creado, el nuevo usuario es " + userEntity.toString());
+
             LoginRequest loginRequest = new LoginRequest(userEntity.getEmail(), registerUserDto.getPassword());
             userEntity.setToken(this.authenticationService.authenticate(loginRequest).jwt());
             userProjection = this.modelMapper.map(userEntity, UserVo.class);

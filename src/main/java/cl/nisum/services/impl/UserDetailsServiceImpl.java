@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import cl.nisum.models.dtos.UserDetailsDto;
-import cl.nisum.models.entities.User;
-import cl.nisum.repositories.UserRepository;
+import cl.nisum.persistence.entities.User;
+import cl.nisum.persistence.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
