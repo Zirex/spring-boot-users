@@ -45,7 +45,7 @@ public class AppConfig implements WebMvcConfigurer {
             .allowedMethods(allowedMethods)
             .maxAge(maxAge);
     }
-    
+
     @Bean
     public ModelMapper getModelMapper() {
         return new ModelMapper();

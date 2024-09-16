@@ -1,4 +1,6 @@
 spring:
+    # autoconfigure:
+    #     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
     application:
         name: users
     datasource:
@@ -14,6 +16,15 @@ spring:
         show-sql: true
         hibernate:
             ddl-auto: create-drop # Hibernate ddl auto (create, create-drop, validate, update, none)
+        defer-datasource-initialization: true
+    sql:    
+        init:
+            mode: always
+    jackson:
+        date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ  # Formato ISO 8601
+        time-zone: UTC
+        serialization:
+            write-dates-as-timestamps: false  # Desactivar serialización como array
 
 # swagger-ui custom path
 springdoc:
@@ -23,3 +34,8 @@ springdoc:
 server:
     servlet:
         context-path: /api/v1
+
+security:
+    jwt:
+        expiration-in-minutes: 30
+        secret-key: ZXN0YSBlcyBtaSBjb250cmFzZW5hIHNlZ3VyYSAxMjM0NTY3ODkgQUJDYWJj
