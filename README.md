@@ -73,7 +73,7 @@ La API utiliza JWT (JSON Web Tokens) para la autenticación de usuarios. El toke
 El token es persistido junto con el usuario para validar futuras solicitudes.
 ### 5. **Documentación con Swagger**
 La API está documentada utilizando Swagger. Puedes acceder a la documentación interactiva de la API en:
-http://localhost:8080/api/v1/swagger-ui/index.html
+[click](http://localhost:8080/api/v1/swagger-ui/index.html)
 ### 6. **Pruebas Unitarias**
 Las pruebas unitarias están implementadas utilizando JUnit y Mockito para asegurar que los servicios funcionan correctamente bajo diferentes escenarios.
 
